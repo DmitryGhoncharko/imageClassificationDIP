@@ -1,0 +1,2 @@
+ALTER TABLE photo_tags
+    ALTER COLUMN tag TYPE TEXT;

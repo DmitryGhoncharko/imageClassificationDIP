@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Админка</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <div class="top">
+        <h1>Админ-панель</h1>
+        <div class="menu">
+            <a th:href="@{/photos}">Мои фото</a>
+            <form method="post" th:action="@{/logout}">
+                <button type="submit" class="secondary">Выйти</button>
+            </form>
+        </div>
+    </div>
+    <p class="ok" th:if="${param.deleted}">Фото удалено.</p>
+    <p class="error" th:if="${param.deleteError}">Не удалось удалить фото.</p>
+
+    <h2>Пользователи</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Логин</th>
+                <th>Роли</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.roles}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Все фото</h2>
+    <div class="grid">
+        <div class="card" th:each="photo : ${photos}">
+            <img th:src="@{'/files/' + ${photo.storedFileName}}" th:alt="${photo.originalFileName}">
+            <div class="meta">
+                <strong th:text="${photo.originalFileName}"></strong>
+                <span th:text="${photo.uploadedBy.username}"></span>
+                <span th:text="${photo.tags.isEmpty() ? 'Теги: -' : 'Теги: ' + #strings.listJoin(photo.tags, ', ')}"></span>
+                <span th:text="${#temporals.format(photo.uploadedAt, 'dd.MM.yyyy HH:mm')}"></span>
+                <form method="post" th:action="@{'/admin/photos/' + ${photo.id} + '/delete'}">
+                    <button type="submit" class="danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
