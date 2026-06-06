@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:16
+    image: public.ecr.aws/docker/library/postgres:16
     container_name: image-dam-db
     restart: unless-stopped
     environment:
