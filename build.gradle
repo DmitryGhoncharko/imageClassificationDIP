@@ -19,24 +19,35 @@ repositories {
 }
 
 dependencies {
+    implementation platform('ai.djl:bom:0.31.1')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'ai.djl:api'
+    implementation 'ai.djl:model-zoo'
+    implementation 'ai.djl.pytorch:pytorch-engine'
+    implementation 'ai.djl.pytorch:pytorch-model-zoo'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
-    implementation 'ai.djl:api:0.29.0'
-    implementation 'ai.djl:model-zoo:0.29.0'
-    implementation 'ai.djl.pytorch:pytorch-engine:0.29.0'
-    implementation 'ai.djl.pytorch:pytorch-model-zoo:0.29.0'
-    runtimeOnly 'ai.djl.pytorch:pytorch-native-auto:2.4.0'
     runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'ai.djl.pytorch:pytorch-native-cpu:2.3.1'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.register('warmupModel', JavaExec) {
+    dependsOn classes
+    group = 'docker'
+    description = 'Download ResNet-50 weights into DJL cache'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'by.ghoncharko.imageclassification.inference.ModelWarmup'
+    environment 'DJL_CACHE_DIR', System.getenv('DJL_CACHE_DIR') ?: "${buildDir}/djl-cache"
 }

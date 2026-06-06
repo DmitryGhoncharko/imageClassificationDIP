@@ -37,8 +37,59 @@ body {
     flex-wrap: wrap;
 }
 
+.app-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+}
+
+.app-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
 .app-top h1 {
     margin: 0;
+}
+
+.app-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.app-nav a {
+    text-decoration: none;
+    color: #3d4460;
+    background: #f3f6ff;
+    border: 1px solid #d8e2ff;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.app-nav a:hover {
+    background: #e8eeff;
+    border-color: #c5d3ff;
+    color: #2f4fc4;
+}
+
+.app-nav a.active {
+    background: #3558e8;
+    border-color: #3558e8;
+    color: #fff;
+}
+
+.panel-title {
+    margin: 0 0 12px;
+    font-size: 16px;
 }
 
 .menu {
@@ -299,6 +350,12 @@ button.small {
     color: #067647;
     background: #ecfdf3;
     border: 1px solid #c7f0d8;
+}
+
+.muted-banner {
+    color: #46526f;
+    background: #edf1fb;
+    border: 1px solid #d6deef;
 }
 
 table {

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Загрузка фото</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script defer th:src="@{/js/app.js}"></script>
+</head>
+<body>
+<div class="container app-shell">
+    <div th:replace="~{fragments/app-header :: header('DAM — Загрузка', 'Добавь новые изображения в библиотеку', 'upload')}"></div>
+
+    <p class="ok banner" th:if="${param.uploaded}">Файлы загружены.</p>
+    <p class="error banner" th:if="${error}" th:text="${error}"></p>
+
+    <section class="panel">
+        <h2 class="panel-title">Загрузка батча</h2>
+        <form method="post" enctype="multipart/form-data" th:action="@{/photos/upload}" class="form upload-form" id="uploadForm">
+            <div class="field-row">
+                <label>Выбери фото (можно несколько)
+                    <input type="file" name="files" id="uploadFiles" accept="image/*" multiple required>
+                </label>
+                <label>Теги для всех загружаемых фото
+                    <input type="text" name="tags" id="uploadTags" placeholder="семья, лето, море">
+                </label>
+            </div>
+            <div class="action-row">
+                <button type="submit">Загрузить батч</button>
+                <span class="muted" id="fileCounter">Файлы не выбраны</span>
+            </div>
+            <div class="tags-preview" id="uploadTagsPreview"></div>
+        </form>
+    </section>
+
+    <p class="muted">
+        После загрузки фото появятся в
+        <a th:href="@{/photos}">библиотеке</a>.
+    </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<mxfile host="app.diagrams.net" agent="Cursor">
+  <diagram id="use-case-image-classification" name="Диаграмма вариантов использования">
+    <mxGraphModel dx="2755" dy="2277" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="user" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Пользователь" vertex="1">
+          <mxGeometry height="80" width="40" x="80" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="admin" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Администратор" vertex="1">
+          <mxGeometry height="80" width="40" x="60" y="940" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_register" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Зарегистрироваться" vertex="1">
+          <mxGeometry height="60" width="170" x="90" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_login" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Авторизоваться" vertex="1">
+          <mxGeometry height="60" width="170" x="240" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_upload" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Загрузить изображения" vertex="1">
+          <mxGeometry height="60" width="190" x="270" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_autotag" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Автотегировать изображения" vertex="1">
+          <mxGeometry height="60" width="210" x="290" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_search" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Искать изображения" vertex="1">
+          <mxGeometry height="60" width="180" x="280" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_similar" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Найти похожие изображения" vertex="1">
+          <mxGeometry height="60" width="230" x="220" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_manage" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Управлять изображениями" vertex="1">
+          <mxGeometry height="60" width="210" x="80" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_admin" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Открыть админ-панель" vertex="1">
+          <mxGeometry height="60" width="190" x="280" y="940" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_reg_login" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Ввести логин" vertex="1">
+          <mxGeometry height="55" width="130" x="120" y="-240" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_reg_pass" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Ввести пароль" vertex="1">
+          <mxGeometry height="55" width="130" x="330" y="-200" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_auth_login" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Ввести логин&#xa;(авторизация)" vertex="1">
+          <mxGeometry height="60" width="150" x="575" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_auth_pass" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Ввести пароль&#xa;(авторизация)" vertex="1">
+          <mxGeometry height="60" width="150" x="510" y="-100" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_select_files" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Выбрать файлы" vertex="1">
+          <mxGeometry height="55" width="140" x="575" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_set_tags" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Указать теги" vertex="1">
+          <mxGeometry height="55" width="130" x="670" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_start_classify" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Запустить классификацию&#xa;(ResNet)" vertex="1">
+          <mxGeometry height="60" width="180" x="725" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_view_status" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Просмотреть статус&#xa;автотегирования" vertex="1">
+          <mxGeometry height="60" width="170" x="730" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_search_name" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Поиск по названию" vertex="1">
+          <mxGeometry height="55" width="150" x="660" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_search_tag" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Поиск по тегу" vertex="1">
+          <mxGeometry height="55" width="130" x="760" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_view_similar" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Просмотреть результаты&#xa;поиска" vertex="1">
+          <mxGeometry height="60" width="170" x="790" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_upload_sample" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Загрузить образец" vertex="1">
+          <mxGeometry height="55" width="150" x="820" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_select_crop" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Выделить область&#xa;на изображении" vertex="1">
+          <mxGeometry height="60" width="170" x="490" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_edit_tags" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Редактировать теги" vertex="1">
+          <mxGeometry height="55" width="150" x="610" y="780" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_delete_photo" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Удалить изображение" vertex="1">
+          <mxGeometry height="55" width="160" x="440" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_view_users" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Просмотреть&#xa;пользователей" vertex="1">
+          <mxGeometry height="60" width="150" x="740" y="960" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_view_all" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Просмотреть&#xa;все изображения" vertex="1">
+          <mxGeometry height="60" width="160" x="670" y="1130" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_admin_delete" parent="1" style="ellipse;whiteSpace=wrap;html=1;" value="Удалить изображение&#xa;(модерация)" vertex="1">
+          <mxGeometry height="60" width="170" x="400" y="1210" as="geometry" />
+        </mxCell>
+        <mxCell id="link_u_register" edge="1" parent="1" source="user" style="endArrow=none;html=1;rounded=0;" target="uc_register">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link_u_login" edge="1" parent="1" source="user" style="endArrow=none;html=1;rounded=0;" target="uc_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link_u_upload" edge="1" parent="1" source="user" style="endArrow=none;html=1;rounded=0;" target="uc_upload">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link_u_autotag" edge="1" parent="1" source="user" style="endArrow=none;html=1;rounded=0;" target="uc_autotag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link_u_search" edge="1" parent="1" source="user" style="endArrow=none;html=1;rounded=0;" target="uc_search">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link_u_similar" edge="1" parent="1" source="user" style="endArrow=none;html=1;rounded=0;" target="uc_similar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link_u_manage" edge="1" parent="1" source="user" style="endArrow=none;html=1;rounded=0;" target="uc_manage">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="link_a_admin" edge="1" parent="1" source="admin" style="endArrow=none;html=1;rounded=0;" target="uc_admin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc1" edge="1" parent="1" source="uc_register" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_reg_login" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc2" edge="1" parent="1" source="uc_register" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_reg_pass" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc3" edge="1" parent="1" source="uc_login" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_auth_login" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc4" edge="1" parent="1" source="uc_login" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_auth_pass" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc5" edge="1" parent="1" source="uc_upload" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_select_files" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc6" edge="1" parent="1" source="uc_upload" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_set_tags" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc7" edge="1" parent="1" source="uc_autotag" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_start_classify" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc8" edge="1" parent="1" source="uc_autotag" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_view_status" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" x="0.209" y="36" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="inc9" edge="1" parent="1" source="uc_search" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_search_name" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc10" edge="1" parent="1" source="uc_search" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_search_tag" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc11" edge="1" parent="1" source="uc_similar" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_view_similar" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc12" edge="1" parent="1" source="uc_manage" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_edit_tags" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc13" edge="1" parent="1" source="uc_manage" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_delete_photo" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc14" edge="1" parent="1" source="uc_admin" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_view_users" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc15" edge="1" parent="1" source="uc_admin" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_view_all" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc16" edge="1" parent="1" source="uc_admin" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_admin_delete" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ext1" edge="1" parent="1" source="uc_upload_sample" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_similar" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ext2" edge="1" parent="1" source="uc_select_crop" style="endArrow=open;dashed=1;html=1;rounded=0;" target="uc_similar" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

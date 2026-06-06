@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupTagEditToggles();
     setupTagQuickSearch();
     setupCropSearch();
+    setupAutoTagStatus();
 });
 
 function setupUploadHelpers() {
@@ -255,4 +256,70 @@ function imageRatioToElementPoint(normX, normY, image) {
 
 function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
+}
+
+function setupAutoTagStatus() {
+    const form = document.querySelector(".js-autotag-form");
+    const statusBox = document.getElementById("autoTagStatus");
+    const submitButton = form ? form.querySelector(".js-autotag-button") : null;
+    if (!form || !statusBox || !submitButton) {
+        return;
+    }
+    const statusUrl = form.dataset.statusUrl;
+    if (!statusUrl) {
+        return;
+    }
+
+    const applyStatus = (status) => {
+        const state = status && status.state ? status.state : "IDLE";
+        const total = Number(status && status.total ? status.total : 0);
+        const processed = Number(status && status.processed ? status.processed : 0);
+        const taggedCount = Number(status && status.taggedCount ? status.taggedCount : 0);
+        const progress = total > 0 ? Math.min(100, Math.round((processed / total) * 100)) : 0;
+
+        statusBox.className = "banner";
+        if (state === "RUNNING") {
+            statusBox.classList.add("ok");
+            if (processed === 0 && total > 0) {
+                statusBox.textContent = `Автотегирование: прогрев модели в Python (${processed}/${total}). Первый запуск может идти несколько минут.`;
+            } else {
+                statusBox.textContent = `Автотегирование: ${processed}/${total} (${progress}%), протегировано: ${taggedCount}`;
+            }
+            submitButton.disabled = true;
+            submitButton.textContent = "Автотегирование...";
+            return;
+        }
+        submitButton.disabled = false;
+        submitButton.textContent = "Автотегировать все непротегированные";
+        if (state === "COMPLETED") {
+            statusBox.classList.add("ok");
+            statusBox.textContent = `Готово: протегировано ${taggedCount} из ${total}`;
+            return;
+        }
+        if (state === "FAILED") {
+            statusBox.classList.add("error");
+            statusBox.textContent = `Ошибка автотегирования: ${status.message || "неизвестная ошибка"}`;
+            return;
+        }
+        statusBox.classList.add("muted-banner");
+        statusBox.textContent = status && status.message ? status.message : "Автотегирование еще не запускалось";
+    };
+
+    const pollStatus = async () => {
+        try {
+            const response = await fetch(statusUrl, { headers: { Accept: "application/json" } });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            const payload = await response.json();
+            applyStatus(payload);
+        } catch (_error) {
+            statusBox.className = "banner error";
+            statusBox.textContent = "Не удалось получить статус автотегирования";
+            submitButton.disabled = false;
+        }
+    };
+
+    pollStatus();
+    setInterval(pollStatus, 2000);
 }

@@ -11,7 +11,10 @@
     <div class="top">
         <h1>Админ-панель</h1>
         <div class="menu">
-            <a th:href="@{/photos}">Мои фото</a>
+            <a th:href="@{/photos}" class="link-button">Мои фото</a>
+            <a th:href="@{/photos/upload}" class="link-button">Загрузка</a>
+            <a th:href="@{/photos/similar}" class="link-button">Поиск похожих</a>
+            <a th:href="@{/photos/autotag}" class="link-button">Автотегирование</a>
             <form method="post" th:action="@{/logout}">
                 <button type="submit" class="secondary">Выйти</button>
             </form>

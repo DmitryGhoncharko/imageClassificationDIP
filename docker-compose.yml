@@ -4,18 +4,44 @@ services:
     container_name: image-dam-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: image_dam
-      POSTGRES_USER: image_user
-      POSTGRES_PASSWORD: image_pass
+      POSTGRES_DB: ${POSTGRES_DB:-image_dam}
+      POSTGRES_USER: ${POSTGRES_USER:-image_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-image_pass}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U image_user -d image_dam"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-image_user} -d ${POSTGRES_DB:-image_dam}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  app:
+    build: .
+    container_name: image-dam-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-image_dam}
+      DB_USER: ${POSTGRES_USER:-image_user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-image_pass}
+      APP_UPLOAD_DIR: /app/uploads
+      DJL_CACHE_DIR: /app/.djl-cache
+      INFERENCE_TOP_TAGS: ${INFERENCE_TOP_TAGS:-2}
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/login || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 5
+
 volumes:
   postgres_data:
+  uploads_data:

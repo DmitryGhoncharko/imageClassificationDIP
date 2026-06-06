@@ -43,6 +43,9 @@ public class Photo {
     @Column(name = "tag", nullable = false, columnDefinition = "TEXT")
     private Set<String> tags = new HashSet<>();
 
+    @Column(name = "clip_embedding_json", columnDefinition = "TEXT")
+    private String clipEmbeddingJson;
+
     public Long getId() {
         return id;
     }
@@ -85,5 +88,13 @@ public class Photo {
 
     public void setTags(Set<String> tags) {
         this.tags = tags;
+    }
+
+    public String getClipEmbeddingJson() {
+        return clipEmbeddingJson;
+    }
+
+    public void setClipEmbeddingJson(String clipEmbeddingJson) {
+        this.clipEmbeddingJson = clipEmbeddingJson;
     }
 }

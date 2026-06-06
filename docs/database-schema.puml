@@ -1,0 +1,41 @@
+@startuml database-schema
+skinparam linetype ortho
+skinparam entity {
+  BackgroundColor #DAE8FC
+  BorderColor #0066CC
+}
+
+entity "users" as users {
+  * id : BIGINT <<PK>>
+  --
+  username : VARCHAR(50)
+  password : VARCHAR(255)
+}
+
+entity "user_roles" as user_roles {
+  * user_id : BIGINT <<FK>>
+  --
+  role : VARCHAR(50)
+}
+
+entity "photos" as photos {
+  * id : BIGINT <<PK>>
+  --
+  original_file_name : VARCHAR(255)
+  stored_file_name : VARCHAR(255)
+  uploaded_at : TIMESTAMPTZ
+  * uploaded_by : BIGINT <<FK>>
+  clip_embedding_json : TEXT
+}
+
+entity "photo_tags" as photo_tags {
+  * photo_id : BIGINT <<FK>>
+  --
+  tag : TEXT
+}
+
+users ||--o{ user_roles : "1:N"
+users ||--o{ photos : "1:N"
+photos ||--o{ photo_tags : "1:N"
+
+@enduml

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Поиск похожих</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script defer th:src="@{/js/app.js}"></script>
+</head>
+<body>
+<div class="container app-shell">
+    <div th:replace="~{fragments/app-header :: header('DAM — Поиск похожих', 'Найди похожие изображения по примеру или выделенному участку', 'similar')}"></div>
+
+    <p class="error banner" th:if="${error}" th:text="${error}"></p>
+
+    <section class="panel">
+        <h2 class="panel-title">Поиск по загруженному примеру</h2>
+        <form method="post" enctype="multipart/form-data" th:action="@{/photos/similar/upload}" class="form">
+            <div class="field-row">
+                <label>Загрузи образец для сравнения
+                    <input type="file" name="sample" accept="image/*" required>
+                </label>
+            </div>
+            <div class="action-row">
+                <button type="submit">Найти похожие</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel" th:if="${!#lists.isEmpty(photos)}">
+        <h2 class="panel-title">Поиск по участку из библиотеки</h2>
+        <p class="muted">Выбери фото, выдели область и нажми «Найти похожие по выделению».</p>
+        <div class="grid">
+            <div class="card" th:each="photo : ${photos}">
+                <img th:src="@{'/files/' + ${photo.storedFileName}}" th:alt="${photo.originalFileName}">
+                <div class="meta">
+                    <strong th:text="${photo.originalFileName}"></strong>
+                    <div class="card-actions">
+                        <button type="button" class="secondary small js-toggle-crop">Выделить участок</button>
+                    </div>
+                    <form method="post"
+                          th:action="@{'/photos/' + ${photo.id} + '/similar/crop'}"
+                          class="crop-search-form hidden">
+                        <div class="crop-box js-crop-box">
+                            <img th:src="@{'/files/' + ${photo.storedFileName}}" th:alt="${photo.originalFileName}" class="crop-image js-crop-image">
+                            <div class="crop-rect js-crop-rect"></div>
+                        </div>
+                        <input type="hidden" name="cropX" value="0.25" class="js-crop-x">
+                        <input type="hidden" name="cropY" value="0.25" class="js-crop-y">
+                        <input type="hidden" name="cropW" value="0.5" class="js-crop-w">
+                        <input type="hidden" name="cropH" value="0.5" class="js-crop-h">
+                        <button type="submit" class="small">Найти похожие по выделению</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel" th:if="${#lists.isEmpty(photos)}">
+        <p class="muted">В библиотеке пока нет фото. Сначала
+            <a th:href="@{/photos/upload}">загрузите изображения</a>.
+        </p>
+    </section>
+
+    <section class="panel" th:if="${!#lists.isEmpty(similarResults)}">
+        <h2 class="panel-title">Результаты поиска</h2>
+        <div class="grid">
+            <div class="card" th:each="item : ${similarResults}">
+                <img th:src="@{'/files/' + ${item.photo.storedFileName}}" th:alt="${item.photo.originalFileName}">
+                <div class="meta">
+                    <strong th:text="${item.photo.originalFileName}"></strong>
+                    <span th:text="'Схожесть: ' + ${#numbers.formatDecimal(item.score * 100, 1, 1)} + '%'"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

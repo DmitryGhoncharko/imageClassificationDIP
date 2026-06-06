@@ -1,0 +1,8 @@
+.git
+.idea
+.gradle
+build
+uploads
+docs/node_modules
+*.iml
+.DS_Store

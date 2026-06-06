@@ -3,6 +3,11 @@ package by.ghoncharko.imageclassification.photo;
 import by.ghoncharko.imageclassification.user.AppUser;
 import by.ghoncharko.imageclassification.user.AppUserRepository;
 import by.ghoncharko.imageclassification.user.Role;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,7 +28,6 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,7 +35,8 @@ import java.util.stream.Collectors;
 @Service
 public class PhotoStorageService {
 
-    private static final double MIN_SIMILARITY_SCORE = 0.5;
+    private static final Logger log = LoggerFactory.getLogger(PhotoStorageService.class);
+    private static final double MIN_SIMILARITY_SCORE = 0.65;
     private static final String DEFAULT_EMPTY_TAG = "без_тегов";
     private static final Set<String> ALLOWED_TYPES = Set.of(
             "image/jpeg",
@@ -43,18 +48,19 @@ public class PhotoStorageService {
     private final Path uploadPath;
     private final PhotoRepository photoRepository;
     private final AppUserRepository appUserRepository;
-    private final ResNetInferenceService resNetInferenceService;
+    private final ImageInferenceService imageInferenceService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public PhotoStorageService(
             @Value("${app.upload-dir}") String uploadDir,
             PhotoRepository photoRepository,
             AppUserRepository appUserRepository,
-            ResNetInferenceService resNetInferenceService
+            ImageInferenceService imageInferenceService
     ) {
         this.uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
         this.photoRepository = photoRepository;
         this.appUserRepository = appUserRepository;
-        this.resNetInferenceService = resNetInferenceService;
+        this.imageInferenceService = imageInferenceService;
     }
 
     @Transactional
@@ -196,8 +202,8 @@ public class PhotoStorageService {
             throw new IllegalArgumentException("Недостаточно прав для автотегирования");
         }
 
-        BufferedImage image = readStoredImage(photo);
-        Set<String> generatedTags = sanitizeTags(new LinkedHashSet<>(resNetInferenceService.autoTagsRu(image, 6)));
+        ImageInferenceService.InferenceResponse response = inferPhotoAndPersistEmbedding(photo);
+        Set<String> generatedTags = sanitizeTags(new LinkedHashSet<>(response.tags()));
         Set<String> merged = new LinkedHashSet<>(photo.getTags());
         merged.remove(DEFAULT_EMPTY_TAG);
         merged.addAll(generatedTags);
@@ -208,20 +214,50 @@ public class PhotoStorageService {
 
     @Transactional
     public int autoTagAllUntaggedPhotos(String username) {
+        return autoTagAllUntaggedPhotos(username, null);
+    }
+
+    public int countUntaggedPhotos(String username) {
         AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
         List<Photo> photos = photoRepository.findByUploadedByOrderByUploadedAtDesc(user);
+        return (int) photos.stream().filter(photo -> !hasRealTags(photo.getTags())).count();
+    }
+
+    @Transactional
+    public int autoTagAllUntaggedPhotos(String username, AutoTagProgressListener progressListener) {
+        AppUser user = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+        List<Photo> photos = photoRepository.findByUploadedByOrderByUploadedAtDesc(user);
+        List<Photo> untaggedPhotos = photos.stream()
+                .filter(photo -> !hasRealTags(photo.getTags()))
+                .toList();
+        int total = untaggedPhotos.size();
         int taggedCount = 0;
-        for (Photo photo : photos) {
-            if (hasRealTags(photo.getTags())) {
-                continue;
+        int processed = 0;
+        if (progressListener != null) {
+            progressListener.onProgress(processed, total, taggedCount);
+        }
+        for (Photo photo : untaggedPhotos) {
+            Path absolutePath = uploadPath.resolve(photo.getStoredFileName()).normalize();
+            try {
+                if (!absolutePath.startsWith(uploadPath) || !Files.exists(absolutePath)) {
+                    log.warn("Skip autotag for photo id={} because file is missing: {}", photo.getId(), absolutePath);
+                } else {
+                    ImageInferenceService.InferenceResponse response = inferPhotoAndPersistEmbedding(photo);
+                    Set<String> generatedTags = sanitizeTags(new LinkedHashSet<>(response.tags()));
+                    if (!generatedTags.isEmpty()) {
+                        photo.setTags(generatedTags);
+                        photoRepository.save(photo);
+                        taggedCount++;
+                    }
+                }
+            } catch (Exception ex) {
+                log.warn("Skip autotag for photo id={} due to inference error: {}", photo.getId(), ex.getMessage());
             }
-            BufferedImage image = readStoredImage(photo);
-            Set<String> generatedTags = sanitizeTags(new LinkedHashSet<>(resNetInferenceService.autoTagsRu(image, 6)));
-            if (!generatedTags.isEmpty()) {
-                photo.setTags(generatedTags);
-                photoRepository.save(photo);
-                taggedCount++;
+            processed++;
+            if (progressListener != null) {
+                progressListener.onProgress(processed, total, taggedCount);
             }
         }
         return taggedCount;
@@ -336,13 +372,13 @@ public class PhotoStorageService {
             Long excludedPhotoId,
             int limit
     ) {
-        Map<String, Double> sampleFeature = resNetInferenceService.embedding(sample);
+        List<Double> sampleEmbedding = inferForBufferedImage(sample, -1L).embedding();
         int safeLimit = Math.max(1, Math.min(limit, 30));
         return candidates.stream()
                 .filter(photo -> excludedPhotoId == null || !photo.getId().equals(excludedPhotoId))
                 .map(photo -> {
-                    BufferedImage img = readStoredImage(photo);
-                    double score = cosineSimilarity(sampleFeature, resNetInferenceService.embedding(img));
+                    List<Double> candidateEmbedding = loadOrInferEmbedding(photo);
+                    double score = cosineSimilarityDense(sampleEmbedding, candidateEmbedding);
                     return new PhotoSimilarity(photo, score);
                 })
                 .filter(similarity -> similarity.getScore() > MIN_SIMILARITY_SCORE)
@@ -374,16 +410,18 @@ public class PhotoStorageService {
         return image.getSubimage(startX, startY, width, height);
     }
 
-    private double cosineSimilarity(Map<String, Double> a, Map<String, Double> b) {
+    private double cosineSimilarityDense(List<Double> a, List<Double> b) {
+        if (a == null || b == null || a.isEmpty() || b.isEmpty() || a.size() != b.size()) {
+            return 0;
+        }
         double dot = 0;
         double normA = 0;
         double normB = 0;
-        for (var entry : a.entrySet()) {
-            double av = entry.getValue();
+        for (int i = 0; i < a.size(); i++) {
+            double av = a.get(i);
+            double bv = b.get(i);
+            dot += av * bv;
             normA += av * av;
-            dot += av * b.getOrDefault(entry.getKey(), 0.0);
-        }
-        for (double bv : b.values()) {
             normB += bv * bv;
         }
         if (normA == 0 || normB == 0) {
@@ -411,5 +449,103 @@ public class PhotoStorageService {
                 .filter(StringUtils::hasText)
                 .map(String::trim)
                 .anyMatch(tag -> !DEFAULT_EMPTY_TAG.equalsIgnoreCase(tag));
+    }
+
+    private ImageInferenceService.InferenceResponse inferPhotoAndPersistEmbedding(Photo photo) {
+        Path absolutePath = uploadPath.resolve(photo.getStoredFileName()).normalize();
+        ImageInferenceService.InferenceResponse response = inferImage(
+                absolutePath,
+                photo.getId(),
+                detectMimeType(absolutePath)
+        );
+        saveEmbedding(photo, response.embedding());
+        photoRepository.save(photo);
+        return response;
+    }
+
+    private ImageInferenceService.InferenceResponse inferForBufferedImage(BufferedImage image, Long pseudoId) {
+        try {
+            Path temp = Files.createTempFile("photo-infer-", ".png");
+            try {
+                ImageIO.write(image, "png", temp.toFile());
+                return inferImage(temp.toAbsolutePath(), pseudoId, "image/png");
+            } finally {
+                Files.deleteIfExists(temp);
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("Не удалось подготовить временный файл для инференса", ex);
+        }
+    }
+
+    private ImageInferenceService.InferenceResponse inferImage(Path absolutePath, Long photoId, String mimeType) {
+        ImageInferenceService.InferenceResponse response = imageInferenceService.infer(absolutePath, photoId, mimeType);
+        if (!"ok".equalsIgnoreCase(response.status())) {
+            throw new IllegalStateException(
+                    "Ошибка классификации изображения: " + (response.error() == null ? "unknown" : response.error())
+            );
+        }
+        if (response.embedding() == null || response.embedding().isEmpty()) {
+            throw new IllegalStateException("Модель вернула пустой embedding");
+        }
+        return response;
+    }
+
+    private List<Double> loadOrInferEmbedding(Photo photo) {
+        List<Double> stored = parseEmbedding(photo.getClipEmbeddingJson());
+        if (!stored.isEmpty()) {
+            return stored;
+        }
+        ImageInferenceService.InferenceResponse response = inferPhotoAndPersistEmbedding(photo);
+        return response.embedding();
+    }
+
+    private void saveEmbedding(Photo photo, List<Double> embedding) {
+        if (embedding == null || embedding.isEmpty()) {
+            return;
+        }
+        try {
+            photo.setClipEmbeddingJson(objectMapper.writeValueAsString(embedding));
+        } catch (JsonProcessingException ex) {
+            throw new IllegalStateException("Не удалось сериализовать embedding", ex);
+        }
+    }
+
+    private List<Double> parseEmbedding(String rawJson) {
+        if (!StringUtils.hasText(rawJson)) {
+            return List.of();
+        }
+        try {
+            return objectMapper.readValue(rawJson, new TypeReference<List<Double>>() {
+            });
+        } catch (Exception ex) {
+            return List.of();
+        }
+    }
+
+    private String detectMimeType(Path filePath) {
+        try {
+            String probe = Files.probeContentType(filePath);
+            if (StringUtils.hasText(probe)) {
+                return probe;
+            }
+        } catch (IOException ignored) {
+            // fallback below
+        }
+        String name = filePath.getFileName().toString().toLowerCase(Locale.ROOT);
+        if (name.endsWith(".png")) {
+            return "image/png";
+        }
+        if (name.endsWith(".webp")) {
+            return "image/webp";
+        }
+        if (name.endsWith(".gif")) {
+            return "image/gif";
+        }
+        return "image/jpeg";
+    }
+
+    @FunctionalInterface
+    public interface AutoTagProgressListener {
+        void onProgress(int processed, int total, int taggedCount);
     }
 }

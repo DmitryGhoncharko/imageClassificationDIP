@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="top app-top" th:fragment="header(title, subtitle, activeNav)">
+    <div class="app-top-row">
+        <div>
+            <h1 th:text="${title}">DAM</h1>
+            <p class="muted" th:text="${subtitle}">Подзаголовок</p>
+        </div>
+        <div class="menu app-menu">
+            <span class="chip" th:text="'Пользователь: ' + ${username}"></span>
+            <a th:if="${isAdmin}" th:href="@{/admin}" class="link-button">Админка</a>
+            <form method="post" th:action="@{/logout}" class="inline-form">
+                <button type="submit" class="secondary">Выйти</button>
+            </form>
+        </div>
+    </div>
+    <nav class="app-nav">
+        <a th:href="@{/photos}" th:classappend="${activeNav == 'photos'} ? ' active' : ''">Мои фото</a>
+        <a th:href="@{/photos/upload}" th:classappend="${activeNav == 'upload'} ? ' active' : ''">Загрузка</a>
+        <a th:href="@{/photos/similar}" th:classappend="${activeNav == 'similar'} ? ' active' : ''">Поиск похожих</a>
+        <a th:href="@{/photos/autotag}" th:classappend="${activeNav == 'autotag'} ? ' active' : ''">Автотегирование</a>
+    </nav>
+</header>
+</body>
+</html>

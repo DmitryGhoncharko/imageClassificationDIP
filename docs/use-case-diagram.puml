@@ -1,0 +1,88 @@
+@startuml
+left to right direction
+
+actor "Пользователь" as User
+actor "Администратор" as Admin
+
+User -[hidden]down- Admin
+
+rectangle "Веб-приложение классификации изображений (ResNet)" {
+
+  usecase "Зарегистрироваться" as UC_Register
+  usecase "Авторизоваться" as UC_Login
+  usecase "Загрузить изображения" as UC_Upload
+  usecase "Автотегировать изображения" as UC_AutoTag
+  usecase "Искать изображения" as UC_Search
+  usecase "Найти похожие изображения" as UC_Similar
+  usecase "Управлять изображениями" as UC_Manage
+
+  usecase "Ввести логин" as UC_RegLogin
+  usecase "Ввести пароль" as UC_RegPass
+  usecase "Ввести логин (авторизация)" as UC_AuthLogin
+  usecase "Ввести пароль (авторизация)" as UC_AuthPass
+  usecase "Выбрать файлы" as UC_SelectFiles
+  usecase "Указать теги" as UC_SetTags
+  usecase "Запустить классификацию (ResNet)" as UC_StartClassify
+  usecase "Просмотреть статус автотегирования" as UC_ViewStatus
+  usecase "Поиск по названию" as UC_SearchName
+  usecase "Поиск по тегу" as UC_SearchTag
+  usecase "Загрузить образец" as UC_UploadSample
+  usecase "Выделить область на изображении" as UC_SelectCrop
+  usecase "Просмотреть результаты поиска" as UC_ViewSimilar
+  usecase "Редактировать теги" as UC_EditTags
+  usecase "Удалить изображение" as UC_DeletePhoto
+
+  usecase "Открыть админ-панель" as UC_AdminPanel
+  usecase "Просмотреть пользователей" as UC_ViewUsers
+  usecase "Просмотреть все изображения" as UC_ViewAllPhotos
+  usecase "Удалить изображение (модерация)" as UC_AdminDelete
+
+}
+
+UC_Register -[hidden]down- UC_Login
+UC_Login -[hidden]down- UC_Upload
+UC_Upload -[hidden]down- UC_AutoTag
+UC_AutoTag -[hidden]down- UC_Search
+UC_Search -[hidden]down- UC_Similar
+UC_Similar -[hidden]down- UC_Manage
+
+User -[hidden]right- UC_Search
+Admin -[hidden]right- UC_AdminPanel
+
+User -- UC_Register
+User -- UC_Login
+User -- UC_Upload
+User -- UC_AutoTag
+User -- UC_Search
+User -- UC_Similar
+User -- UC_Manage
+
+Admin -- UC_AdminPanel
+
+UC_Register ..> UC_RegLogin : <<include>>
+UC_Register ..> UC_RegPass : <<include>>
+
+UC_Login ..> UC_AuthLogin : <<include>>
+UC_Login ..> UC_AuthPass : <<include>>
+
+UC_Upload ..> UC_SelectFiles : <<include>>
+UC_Upload ..> UC_SetTags : <<include>>
+
+UC_AutoTag ..> UC_StartClassify : <<include>>
+UC_AutoTag ..> UC_ViewStatus : <<include>>
+
+UC_Search ..> UC_SearchName : <<include>>
+UC_Search ..> UC_SearchTag : <<include>>
+
+UC_Similar ..> UC_ViewSimilar : <<include>>
+UC_UploadSample ..> UC_Similar : <<extend>>
+UC_SelectCrop ..> UC_Similar : <<extend>>
+
+UC_Manage ..> UC_EditTags : <<include>>
+UC_Manage ..> UC_DeletePhoto : <<include>>
+
+UC_AdminPanel ..> UC_ViewUsers : <<include>>
+UC_AdminPanel ..> UC_ViewAllPhotos : <<include>>
+UC_AdminPanel ..> UC_AdminDelete : <<include>>
+
+@enduml
