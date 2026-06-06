@@ -30,6 +30,7 @@ services:
       APP_UPLOAD_DIR: /app/uploads
       DJL_CACHE_DIR: /app/.djl-cache
       INFERENCE_TOP_TAGS: ${INFERENCE_TOP_TAGS:-2}
+      INFERENCE_MIN_CONFIDENCE: ${INFERENCE_MIN_CONFIDENCE:-0.08}
     volumes:
       - uploads_data:/app/uploads
     depends_on:
